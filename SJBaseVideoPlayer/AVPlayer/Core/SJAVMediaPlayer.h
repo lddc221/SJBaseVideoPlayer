@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSTimeInterval trialEndPosition;
 @property (nonatomic, strong, readonly) AVPlayer *avPlayer;
+@property(nonatomic,strong) AVPlayerItemVideoOutput * playerOutput;
 @property (nonatomic, readonly) SJPlaybackType playbackType;
 @property (nonatomic) NSTimeInterval minBufferedDuration;
 @property (nonatomic) BOOL accurateSeeking;
