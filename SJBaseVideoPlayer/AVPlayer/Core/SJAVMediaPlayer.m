@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
     if ( self ) {
         _rate = 1;
         _avPlayer = player;
+        self.playerOutput = [[AVPlayerItemVideoOutput alloc] init];
+        [_avPlayer.currentItem addOutput:self.playerOutput];
         _assetStatus = SJAssetStatusPreparing;
         _startPosition = time;
         _needsSeekToStartPosition = time != 0;
@@ -260,7 +262,24 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable UIImage *)screenshot {
-    return [_avPlayer.currentItem.asset sj_screenshotWithTime:_avPlayer.currentTime];
+    
+    return [self screenshotsm3u8WithCurrentTime:_avPlayer.currentItem.currentTime playerItemVideoOutput:self.playerOutput];
+   
+}
+
+-(UIImage *)screenshotsm3u8WithCurrentTime:(CMTime)currentTime playerItemVideoOutput:(AVPlayerItemVideoOutput *)output{
+    
+    CVPixelBufferRef pixelBuffer = [output copyPixelBufferForItemTime:currentTime itemTimeForDisplay:nil];
+    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+    CIContext *temporaryContext = [CIContext contextWithOptions:nil];
+    CGImageRef videoImage = [temporaryContext createCGImage:ciImage
+                                                   fromRect:CGRectMake(0, 0,
+                                                 CVPixelBufferGetWidth(pixelBuffer),
+                                                 CVPixelBufferGetHeight(pixelBuffer))];
+    UIImage *frameImg = [UIImage imageWithCGImage:videoImage];
+    CGImageRelease(videoImage);
+    CVBufferRelease(pixelBuffer);
+    return frameImg;
 }
 
 #pragma mark -
